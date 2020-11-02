@@ -17,6 +17,9 @@ const Accounts = {
     },
     update(id, account) {
         return db('accounts').where({ id }).update(account)
+    },
+    delete(id) {
+        return db('accounts').where({ id }).delete()
     }
 }
 
@@ -59,11 +62,25 @@ router.put('/:id', (req, res) => {
             if (updatedItems === 1) {
                 return Accounts.getById(req.params.id)
             } else if (updatedItems === 0) {
-                res.status(404).json({ message: `Account with ID ${req.params.id} not found `})
+                res.status(404).json({ message: `Account with ID ${req.params.id} not found ` })
             }
         })
         .then(account => {
             res.status(200).json(account)
+        })
+        .catch(error => {
+            res.status(500).json({ error: error.message })
+        })
+})
+
+router.delete('/:id', (req, res) => {
+    Accounts.delete(req.params.id)
+        .then(deletedItems => {
+            if (deletedItems === 1) {
+                res.status(200).json({ message: 'Success', deletedItems })
+            } else if (deletedItems === 0) {
+                res.status(404).json({ message: `Account with ID ${req.params.id} not found ` })
+            }
         })
         .catch(error => {
             res.status(500).json({ error: error.message })
